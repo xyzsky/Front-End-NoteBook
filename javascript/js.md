@@ -1042,7 +1042,7 @@ document.cookie = 'user='+ encodeURIComponent('name')  + ';expires = ' + new Dat
 - `start` 指定选取开始位置（含）
 - `end` 指定选取结束位置（不含）
 
-`**splice**`
+**`splice`**
 
 - “操作”数组指定的元素，会修改原数组，返回被删除的元素
 - 语法：`arr.splice(index, count, [insert Elements])`
@@ -1111,3 +1111,74 @@ DOM渲染必须是按顺序的，同时只能有一个命令操作dom, 不可以
 HTML5新添加了 WebWorkers，是 HTML5提供的一个JavaScript多线程解决方案
 
 单子线程完全受主线程的控制，且不可以操作DOM
+
+### 84. bind, call ,apply 的异同
+
+- call , apply  都是立即调用函数，不同的是call 传入一个个的参数列表，而apply传入一个参数数组
+- bind 是返回一个函数，在需要的时候执行调用即可。
+
+### 85. 变量提升
+
+在生成执行环境时，会有两个阶段，第一个阶段是创建阶段，JS 解释器会找出需要提升的变量和函数，并且给他们在内存中开辟好空间，**函数的话会将整个函数存入内存中**，**变量只声明并且赋值为 `undefined`** , 第二个阶段是代码执行阶段，我们可以直接使用提前声明的变量和函数
+
+### 86. 原型链
+
+- 每个函数都要  `prototype` 属性，
+
+- 每个对象都有 `__proto__` 属性，指向了创建该对象的构造函数的原型
+
+- 对象可以通过 `__proto__` 来寻找不属于该对象的属性，`__proto__` 将对象连接起来组成了原型链。
+
+### 87. 怎么判断对象类型
+
+- 可以通过 `Object.prototype.toString.call(xx)`。这样我们就可以获得类似 `[object Type]` 的字符串。
+- `instanceof` 可以正确的判断对象的类型，因为内部机制是通过判断对象的原型链中是不是能找到类型的 `prototype`
+
+### 88. async、await 优缺点
+
+​		`async  await` 实际上就是 `generator` 和 `yield` 的语法糖！
+
+​		`async` 和 `await` 相比直接使用 `Promise` 来说，优势在于处理 then 的调用链，能够更清晰准确的写出代码。缺点在于滥用 `await` 可能会导致性能问题，因为 `await` 会阻塞代码，也许之后的异步代码并不依赖于前者，但仍然需要等待前者完成，导致代码失去了并发性
+
+### 89. generator 原理
+
+`Generator` 是 `ES6`中新增的语法，和 `Promise` 一样，都可以用来异步编程
+
+从以上代码可以发现，加上 `*`的函数执行后拥有了 `next` 函数，也就是说函数执行后返回了一个对象。每次调用 `next` 函数可以继续执行被暂停的代码。以下是 `Generator` 函数的简单实现
+
+###  90. Promise
+
+- `Promise` 是 `ES6` 新增的语法，解决了回调地狱的问题。
+- 可以把 `Promise`看成一个状态机。初始是 `pending` 状态，可以通过函数 `resolve` 和 `reject`，将状态转变为 `resolved` 或者 `rejected` 状态，状态一旦改变就不能再次变化。
+- `then` 函数会返回一个 `Promise` 实例，并且该返回值是一个新的实例而不是之前的实例。因为 `Promise` 规范规定除了 `pending` 状态，其他状态是不可以改变的，如果返回的是一个相同实例的话，多个 `then` 调用就失去意义了。 对于 `then` 来说，本质上可以把它看成是 `flatMap`
+
+### 91 == 和 ===
+
+== 会存在类型强制转换
+
+=== 会比较类型，类型不同也会返回 false
+
+eg： `[] == ![]  //  true  `
+
+- ![] = false
+- [] = 0
+- false = 0
+- ture
+
+### 92 浏览器 Eventloop 和 Node 中的有什么区别
+
+​		众所周知 JS 是门非阻塞单线程语言，因为在最初 JS 就是为了和浏览器交互而诞生的。如果 JS 是门多线程的语言话，我们在多个线程中处理 DOM 就可能会发生问题（一个线程中新加节点，另一个线程中删除节点），当然可以引入读写锁解决这个问题。
+
+- `JS` 在执行的过程中会产生执行环境，这些执行环境会被顺序的加入到执行栈中。如果遇到异步的代码，会被挂起并加入到 `Task`（有多种 `task`） 队列中。一旦执行栈为空，`Event Loop` 就会从 `Task` 队列中拿出需要执行的代码并放入执行栈中执行，所以本质上来说 `JS` 中的异步还是同步行为
+
+- 不同的任务源会被分配到不同的 `Task`队列中，任务源可以分为 微任务（`microtask`） 和 宏任务（`macrotask`）。在 ES6 规范中，`microtask` 称为 jobs，`macrotask` 称为 `task`。
+
+**微任务包括** `process.nextTick` ，`promise` ，`Object.observe`，`MutationObserver`
+
+**宏任务包括** `script` ， `setTimeout` ，`setInterval`，`setImmediate` ，`I/O` ，`UI renderin`
+
+### 92 typeof 于 instanceof 区别
+
+`typeof` 对于基本类型，除了 `null`都可以显示正确的类型 object
+
+instanceof` 可以正确的判断对象的类型，因为内部机制是通过判断对象的原型链中是不是能找到类型的 `prototype

@@ -177,3 +177,48 @@
 - 使用`font-size:0`
 - `letter-spacing`
 - `word-spacing`
+
+### 17 rem/ em
+
+rem 是依据根元素字体大小判断
+
+em  是依据当前使用em的元素字体大小判断
+
+- rem 单位翻译为像素值是由 html 元素的字体大小决定的。 此字体大小会被浏览器中字体大小的设置影响，除非显式重写一个具体单位。
+- em 单位转为像素值，取决于他们使用的字体大小。 此字体大小受从父元素继承过来的字体大小，除非显式重写与一个具体单位。
+
+### 18. transition 和 animation的区别
+
+ `Animation `和 `transition` 大部分属性是相同的，他们都是随时间改变元素的属性值，他们的主要区别是`transition`需要触发一个事件才能改变属性，而 animation 不需要触发任何事件的情况下才会随时间改变属性值，并且`transition`为2帧，从from .... to，而 `animation`可以一帧一帧的。
+
+### 19 弹性盒布局
+
+采用 Flex 布局的元素，称为 Flex 容器（flex container），简称"容器"。它的所有子元素自动成为容器成员，称为 Flex 项目（flex item），简称"项目"。
+
+容器属性：
+
+> - flex-direction
+> - flex-wrap
+> - flex-flow
+> - justify-content
+> - align-items
+> - align-content
+
+项目属性：
+
+> - `order`
+> - `flex-grow`
+> - `flex-shrink`
+> - `flex-basis`
+> - `flex`
+> - `align-self`
+
+### 20 垂直居中的方法
+
+**未知高度宽度**
+
+### 21. vh与vw
+
+视口高度，视口宽度
+
+`1vh = 视口高度 * 1%``1wh = 视口宽度 * 1%`

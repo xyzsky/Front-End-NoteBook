@@ -685,3 +685,499 @@ http://www.example.com/index.html#print
 - `pushState`设置的新`url`可以与当前`url`一模一样，这样也会把记录添加到栈中，而`hash`设置的新值必须与原来不一样才会触发记录添加到栈中
 - `pushState`通过`stateObject`可以添加任意类型的数据记录中，而`hash`只可添加短字符串
 - `pushState`可额外设置`title`属性供后续使用
+
+### 4.  详细说下你对vue生命周期的理解
+
+> 答：总共分为8个阶段创建前/后，载入前/后，更新前/后，销毁前/后
+
+**生命周期是什么**
+
+> Vue 实例有一个完整的生命周期，也就是从开始创建、初始化数据、编译模版、挂载Dom -> 渲染、更新 -> 渲染、卸载等一系列过程，我们称这是Vue的生命周期
+
+**各个生命周期的作用**
+
+| 生命周期      | 描述                                                         |
+| ------------- | ------------------------------------------------------------ |
+| beforeCreate  | 组件实例被创建之初，组件的属性生效之前                       |
+| created       | 组件实例已经完全创建，属性也绑定，但真实dom还没有生成，$el还不可用 |
+| beforeMount   | 在挂载开始之前被调用：相关的 render 函数首次被调用           |
+| mounted       | el 被新创建的 vm.$el 替换，并挂载到实例上去之后调用该钩子    |
+| beforeUpdate  | 组件数据更新之前调用，发生在虚拟 DOM 打补丁之前              |
+| update        | 组件数据更新之后                                             |
+| activited     | keep-alive专属，组件被激活时调用                             |
+| deadctivated  | keep-alive专属，组件被销毁时调用                             |
+| beforeDestory | 组件销毁前调用                                               |
+| destoryed     | 组件销毁后调用                                               |
+
+![img](http://poetries1.gitee.io/img-repo/2020/07/61.png)d
+
+> 由于Vue会在初始化实例时对属性执行`getter/setter`转化，所以属性必须在`data`对象上存在才能让`Vue`将它转换为响应式的。Vue提供了`$set`方法用来触发视图更新
+
+```js
+export default {
+    data(){
+        return {
+            obj: {
+                name: 'fei'
+            }
+        }
+    },
+    mounted(){
+        this.$set(this.obj, 'sex', 'man')
+    }
+
+}
+```
+
+**什么是vue生命周期？**
+
+- 答： Vue 实例从创建到销毁的过程，就是生命周期。从开始创建、初始化数据、编译模板、挂载Dom→渲染、更新→渲染、销毁等一系列过程，称之为 Vue 的生命周期。
+
+**vue生命周期的作用是什么？**
+
+- 答：它的生命周期中有多个事件钩子，让我们在控制整个Vue实例的过程时更容易形成好的逻辑。
+
+**vue生命周期总共有几个阶段？**
+
+- 答：它可以总共分为`8`个阶段：创建前/后、载入前/后、更新前/后、销毁前/销毁后。
+
+**第一次页面加载会触发哪几个钩子？**
+
+- 答：会触发下面这几个`beforeCreate`、`created`、`beforeMount`、`mounted` 。
+
+**DOM 渲染在哪个周期中就已经完成？**
+
+- 答：`DOM` 渲染在 `mounted` 中就已经完成了
+
+### 5. Vue实现数据双向绑定的原理：Object.defineProperty()
+
+- `vue`实现数据双向绑定主要是：采用数据劫持结合发布者-订阅者模式的方式，通过 `Object.defineProperty()` 来劫持各个属性的`setter`，`getter`，在数据变动时发布消息给订阅者，触发相应监听回调。当把一个普通 `Javascript` 对象传给 Vue 实例来作为它的 `data` 选项时，Vue 将遍历它的属性，用 `Object.defineProperty()` 将它们转为 `getter/setter`。用户看不到 `getter/setter`，但是在内部它们让 `Vue`追踪依赖，在属性被访问和修改时通知变化。
+- vue的数据双向绑定 将`MVVM`作为数据绑定的入口，整合`Observer`，`Compile`和`Watcher`三者，通过`Observer`来监听自己的`model`的数据变化，通过`Compile`来解析编译模板指令（`vue`中是用来解析 `{{}}`），最终利用`watcher`搭起`observer`和`Compile`之间的通信桥梁，达到数据变化 —>视图更新；视图交互变化（`input`）—>数据`model`变更双向绑定效果。
+
+### 6. Vue组件间的参数传递
+
+**父组件与子组件传值**
+
+> 父组件传给子组件：子组件通过`props`方法接受数据；
+
+- 子组件传给父组件： `$emit` 方法传递参数
+
+**非父子组件间的数据传递，兄弟组件传值**
+
+> `eventBus`，就是创建一个事件中心，相当于中转站，可以用它来传递事件和接收事件。项目比较小时，用这个比较合适（虽然也有不少人推荐直接用`VUEX`，具体来说看需求）
+
+### 7. Vue的路由实现：hash模式 和 history模式
+
+- `hash`模式：在浏览器中符号`“#”`，#以及#后面的字符称之为`hash`，用 `window.location.hash` 读取。特点：`hash`虽然在`URL`中，但不被包括在`HTTP`请求中；用来指导浏览器动作，对服务端安全无用，`hash`不会重加载页面。
+- `history`模式：h`istory`采用`HTML5`的新特性；且提供了两个新方法： `pushState()`， `replaceState()`可以对浏览器历史记录栈进行修改，以及`popState`事件的监听到状态变更
+
+### 8. vue路由的钩子函数
+
+> 首页可以控制导航跳转，`beforeEach`，`afterEach`等，一般用于页面`title`的修改。一些需要登录才能调整页面的重定向功能。
+
+- `beforeEach`主要有3个参数`to`，`from`，`next`。
+- `to`：`route`即将进入的目标路由对象。
+- `from`：`route`当前导航正要离开的路由。
+- `next`：`function`一定要调用该方法`resolve`这个钩子。执行效果依赖n`ext`方法的调用参数。可以控制网页的跳转
+
+### 9. v-if 和 v-show 区别
+
+- 答：`v-if`按照条件是否渲染，`v-show`是`display`的`block`或`none`；
+
+### 10. `$route`和`$router`的区别
+
+- `$route`是“路由信息对象”，包括`path`，`params`，`hash`，`query`，`fullPath`，`matched`，`name`等路由信息参数。
+- 而`$router`是“路由实例”对象包括了路由的跳转方法，钩子函数等
+
+### 11. 如何让CSS只在当前组件中起作用?
+
+> 将当前组件的`<style>`修改为`<style scoped>`
+
+### 12. `<keep-alive></keep-alive>`的作用是什么?
+
+> keep-alive可以实现组件缓存，当组件切换时不会对当前组件进行卸载
+
+- `<keep-alive></keep-alive>` 包裹动态组件时，会缓存不活动的组件实例,主要用于保留组件状态或避免重新渲染
+
+> 比如有一个列表和一个详情，那么用户就会经常执行打开详情=>返回列表=>打开详情…这样的话列表和详情都是一个频率很高的页面，那么就可以对列表组件使用`<keep-alive></keep-alive>`进行缓存，这样用户每次返回列表的时候，都能从缓存中快速渲染，而不是重新渲染
+
+- 常用的两个属性`include/exclude`，允许组件有条件的进行缓存
+- 两个生命周期`activated/deactivated`，用来得知当前组件是否处于活跃状态
+
+### 13. Vue 组件 data 为什么必须是函数
+
+- 每个组件都是 `Vue` 的实例, new Vue() 创建，如果 data 是对象的话，一旦修改也给组件中的 data 数据， 其它组件中要有同名的也会被修改。
+- 组件共享 `data` 属性，当 `data` 的值是同一个引用类型的值时，改变其中一个会影响其他
+- 如果data 是函数的话，每个组件的 data 都有的 自己的 作用域，不会互相干扰
+
+### 14. vue的优点是什么？
+
+- 低耦合。视图（`View`）可以独立于`Model`变化和修改，一个`ViewModel`可以绑定到不同的`"View"`上，当View变化的时候Model可以不变，当`Model`变化的时候`View`也可以不变
+- 可重用性。你可以把一些视图逻辑放在一个`ViewModel`里面，让很多`view`重用这段视图逻辑
+- 可测试。界面素来是比较难于测试的，而现在测试可以针对`ViewModel`来写
+
+### 15 路由之间跳转？
+
+**声明式（标签跳转）**
+
+```text
+<router-link :to="index">
+```
+
+**编程式（ js跳转）**
+
+```text
+router.push('index')
+```
+
+### 16 Vue complier 实现
+
+- 模板解析这种事，本质是将数据转化为一段 `html` ，最开始出现在后端，经过各种处理吐给前端。随着各种 `mv*` 的兴起，模板解析交由前端处理。
+- 总的来说，`Vue complier` 是将 `template` 转化成一个 `render` 字符串。
+
+> 可以简单理解成以下步骤：
+
+- `parse` 过程，将 `template` 利用正则转化成`AST` 抽象语法树。
+- `optimize` 过程，标记静态节点，后 `diff` 过程跳过静态节点，提升性能。
+- `generate` 过程，生成 `render` 字符串
+
+### 17. Proxy 相比于 defineProperty 的优势
+
+> Object.defineProperty() 的问题主要有三个：
+
+- 不能监听数组的变化
+- 必须遍历对象的每个属性
+- 必须深层遍历嵌套的对象
+
+> Proxy 在 ES2015 规范中被正式加入，它有以下几个特点
+
+- 针对对象：针对整个对象，而不是对象的某个属性，所以也就不需要对 keys 进行遍历。这解决了上述 Object.defineProperty() 第二个问题
+- 支持数组：Proxy 不需要对数组的方法进行重载，省去了众多 hack，减少代码量等于减少了维护成本，而且标准的就是最好的。
+
+> 除了上述两点之外，Proxy 还拥有以下优势：
+
+- Proxy 的第二个参数可以有 13 种拦截方法，这比起 Object.defineProperty() 要更加丰富
+- Proxy 作为新标准受到浏览器厂商的重点关注和性能优化，相比之下 Object.defineProperty() 是一个已有的老方法。
+
+### 18. vue-router 有哪几种导航守卫?
+
+- 全局守卫
+- 路由独享守卫
+- 路由组件内的守卫
+
+**全局守卫**
+
+> vue-router全局有三个守卫
+
+- `router.beforeEach` 全局前置守卫 进入路由之前
+- `router.beforeResolve` 全局解析守卫(2.5.0+) 在`beforeRouteEnter`调用之后调用
+- `router.afterEach` 全局后置钩子 进入路由之后
+
+```js
+// main.js 入口文件
+import router from './router'; // 引入路由
+router.beforeEach((to, from, next) => { 
+  next();
+});
+router.beforeResolve((to, from, next) => {
+  next();
+});
+router.afterEach((to, from) => {
+  console.log('afterEach 全局后置钩子');
+});
+```
+
+**路由独享守卫**
+
+> 如果你不想全局配置守卫的话，你可以为某些路由单独配置守卫
+
+```js
+const router = new VueRouter({
+  routes: [
+    {
+      path: '/foo',
+      component: Foo,
+      beforeEnter: (to, from, next) => { 
+        // 参数用法什么的都一样,调用顺序在全局前置守卫后面，所以不会被全局守卫覆盖
+        // ...
+      }
+    }
+  ]
+})
+```
+
+**路由组件内的守卫**
+
+- beforeRouteEnter 进入路由前, 在路由独享守卫后调用 不能 获取组件实例 this，组件实例还没被创建
+- beforeRouteUpdate (2.2) 路由复用同一个组件时, 在当前路由改变，但是该组件被复用时调用 可以访问组件实例 this
+- beforeRouteLeave 离开当前路由时, 导航离开该组件的对应路由时调用，可以访问组件实例 this
+
+### 19 Vue2.x 响应式原理
+
+> Vue 采用数据劫持结合发布—订阅模式的方法，通过 Object.defineProperty() 来劫持各个属性的 setter，getter，在数据变动时发布消息给订阅者，触发相应的监听回调。
+
+![img](http://poetries1.gitee.io/img-repo/20190922/vue.jpeg)
+
+- `Observer` 遍历数据对象，给所有属性加上 `setter` 和 `getter`，监听数据的变化
+- `compile` 解析模板指令，将模板中的变量替换成数据，然后初始化渲染页面视图，并将每个指令对应的节点绑定更新函数，添加监听数据的订阅者，一旦数据有变动，收到通知，更新视图
+
+> `Watcher` 订阅者是 `Observer` 和 `Compile` 之间通信的桥梁，主要做的事情
+
+- 在自身实例化时往属性订阅器 (`dep`) 里面添加自己
+- 待属性变动 `dep.notice()` 通知时，调用自身的 `update()` 方法，并触发 `Compile` 中绑定的回调
+
+**Vue3.x响应式数据原理**
+
+> `Vue3.x`改用P`roxy`替代`Object.defineProperty`。因为P`roxy`可以直接监听对象和数组的变化，并且有多达13种拦截方法。并且作为新标准将受到浏览器厂商重点持续的性能优化。
+
+`Proxy`只会代理对象的第一层，那么`Vue3`又是怎样处理这个问题的呢？
+
+> 判断当前`Reflect.get的`返回值是否为`Object`，如果是则再通过`reactive`方法做代理， 这样就实现了深度观测。
+
+**监测数组的时候可能触发多次get/set，那么如何防止触发多次呢？**
+
+> 我们可以判断`key`是否为当前被代理对象`target`自身属性，也可以判断旧值与新值是否相等，只有满足以上两个条件之一时，才有可能执行`trigger`
+
+### 20 v-model双向绑定原理
+
+> `v-model`本质上是语法糖，`v-model`在内部为不同的输入元素使用不同的属性并抛出不同的事件
+
+- `text` 和 `textarea` 元素使用 value 属性和 input 事件
+
+- `checkbox` 和 `radio` 使用 checked 属性和 change 事件
+
+- `select` 字段将 value 作为 prop 并将 change 作为事件
+
+  `v-model`本质就是一个语法糖，可以看成是`value + input`方法的语法糖。 可以通过`model`属性的`prop`和`event`属性来进行自定义。原生的`v-model`，会根据标签的不同生成不同的事件和属性
+
+**所以我们可以v-model进行如下改写：**
+
+```html
+<input v-model="sth" />
+//  等同于
+<input :value="sth" @input="sth = $event.target.value" />
+```
+
+- 这个语法糖必须是固定的，也就是说属性必须为`value`，方法名必须为：`input`。
+- 知道了`v-model`的原理，我们可以在自定义组件上实现`v-model`
+
+```text
+//Parent
+<template>
+    {{num}}
+    <Child v-model="num">
+</template>
+export default {
+    data(){
+        return {
+            num: 0
+        }
+    }
+}
+
+//Child
+<template>
+    <div @click="add">Add</div>
+</template>
+export default {
+    props: ['value'],
+    methods:{
+        add(){
+            this.$emit('input', this.value + 1)
+        }
+    }
+}
+```
+
+### 21 vue 项目性能优化
+
+**代码层面：**
+
+- 合理使用 `v-if` 和 `v-show`
+- 区分 `computed` 和 `watch` 的使用
+- `v-for` 遍历为 `item` 添加 `key`
+- `v-for` 遍历避免同时使用 `v-if`
+- 通过 `addEventListener`添加的事件在组件销毁时要用 `removeEventListener` 手动移除这些事件的监听
+- 图片懒加载
+- 路由懒加载
+- 第三方插件按需引入
+- `SSR`服务端渲染，首屏加载速度快，`SEO`效果好
+
+**Webpack 层面优化：**
+
+- 对图片进行压缩
+- 使用 `CommonsChunkPlugin` 插件提取公共代码
+- 提取组件的 CSS
+- 优化 `SourceMap`
+- 构建结果输出分析，利用 `webpack-bundle-analyzer` 可视化分析工具
+
+### 22 nextTick
+
+> ```
+> nextTick` 可以让我们在下次 `DOM` 更新循环结束之后执行延迟回调，用于获得更新后的 `DOM
+> ```
+
+`nextTick`主要使用了宏任务和微任务。根据执行环境分别尝试采用
+
+- `Promise`
+- `MutationObserver`
+- `setImmediate`
+- 如果以上都不行则采用`setTimeout`
+
+> 定义了一个异步方法，多次调用`nextTick`会将方法存入队列中，通过这个异步方法清空当前队列
+
+### 23. 说一下vue2.x中如何监测数组变化
+
+> 使用了函数劫持的方式，重写了数组的方法，`Vue`将`data`中的数组进行了原型链重写，指向了自己定义的数组原型方法。这样当调用数组api时，可以通知依赖更新。如果数组中包含着引用类型，会对数组中的引用类型再次递归遍历进行监控。这样就实现了监测数组变化。
+
+### 24. Vue事件绑定原理
+
+> 原生事件绑定是通过`addEventListener`绑定给真实元素的，组件事件绑定是通过`Vue`自定义的`$on`实现的
+
+### 25.  Vue模版编译原理知道吗，能简单说一下吗？
+
+> 简单说，`Vue`的编译过程就是将`template`转化为`render`函数的过程。会经历以下阶段：
+
+- 生成`AST`树
+- 优化
+- `codegen`
+- 首先解析模版，生成`AST`语法树(一种用J`avaScript`对象的形式来描述整个模板)。 使用大量的正则表达式对模板进行解析，遇到标签、文本的时候都会执行对应的钩子进行相关处理。
+- `Vue`的数据是响应式的，但其实模板中并不是所有的数据都是响应式的。有一些数据首次渲染后就不会再变化，对应的DOM也不会变化。那么优化过程就是深度遍历AST树，按照相关条件对树节点进行标记。这些被标记的节点(静态节点)我们就可以跳过对它们的比对，对运行时的模板起到很大的优化作用。
+- 编译的最后一步是将优化后的`AST`树转换为可执行的代码
+
+### 26 Vue2.x和Vue3.x渲染器的diff算法分别说一下
+
+> 简单来说，`diff`算法有以下过程
+
+- 同级比较，再比较子节点
+- 先判断一方有子节点一方没有子节点的情况(如果新的`children`没有子节点，将旧的子节点移除)
+- 比较都有子节点的情况(核心`diff`)
+- 递归比较子节点
+- 正常`Diff`两个树的时间复杂度是`O(n^3)`，但实际情况下我们很少会进行跨层级的移动`DOM`，所以`Vue`将`Diff`进行了优化，从`O(n^3) -> O(n)`，只有当新旧`children`都为多个子节点时才需要用核心的`Diff`算法进行同层级比较。
+- `Vue2`的核心`Diff`算法采用了双端比较的算法，同时从新旧`children`的两端开始进行比较，借助`key`值找到可复用的节点，再进行相关操作。相比`React`的`Diff`算法，同样情况下可以减少移动节点次数，减少不必要的性能损耗，更加的优雅
+- 在创建`VNode`时就确定其类型，以及在`mount/patch`的过程中采用位运算来判断一个`VNode`的类型，在这个基础之上再配合核心的`Diff`算法，使得性能上较`Vue2.x`有了提升
+
+### 27 再说一下虚拟Dom以及key属性的作用
+
+- 由于在浏览器中操作`DOM`是很昂贵的。频繁的操作`DOM`，会产生一定的性能问题。这就是虚拟Dom的产生原因
+- `Virtual DOM`本质就是用一个原生的JS对象去描述一个`DOM`节点。是对真实DOM的一层抽象
+- `VirtualDOM`映射到真实DOM要经历`VNode`的`create`、`diff`、`patch`等阶段
+
+**key的作用是尽可能的复用 DOM 元素**
+
+- 新旧 `children` 中的节点只有顺序是不同的时候，最佳的操作应该是通过移动元素的位置来达到更新的目的
+- 需要在新旧 `children` 的节点中保存映射关系，以便能够在旧 `children` 的节点中找到可复用的节点。`key`也就是`children`中节点的唯一标识
+
+###  28 Vue中组件生命周期调用顺序说一下
+
+- 组件的调用顺序都是先父后子,渲染完成的顺序是先子后父。
+- 组件的销毁操作是先父后子，销毁完成的顺序是先子后父。
+
+**加载渲染过程**
+
+> ```
+> 父beforeCreate`->`父created`->`父beforeMount`->`子beforeCreate`->`子created`->`子beforeMount`- >`子mounted`->`父mounted
+> ```
+
+**子组件更新过程**
+
+> ```
+> 父beforeUpdate`->`子beforeUpdate`->`子updated`->`父updated
+> ```
+
+**父组件更新过程**
+
+> ```
+> 父 beforeUpdate` -> `父 updated
+> ```
+
+**销毁过程**
+
+> ```
+> 父beforeDestroy`->`子beforeDestroy`->`子destroyed`->`父destroyed
+> ```
+
+### 29. SSR了解吗
+
+> `SSR`也就是服务端渲染，也就是将`Vue`在客户端把标签渲染成HTML的工作放在服务端完成，然后再把html直接返回给客户端
+
+`SSR`有着更好的`SEO`、并且首屏加载速度更快等优点。不过它也有一些缺点，比如我们的开发条件会受到限制，服务器端渲染只支持`beforeCreate`和`created`两个钩子，当我们需要一些外部扩展库时需要特殊处理，服务端渲染应用程序也需要处于`Node.js`的运行环境。还有就是服务器会有更大的负载需求
+
+### 30. Vue.js特点
+
+- 简洁：页面由`HTML`模板+Json数据+`Vue`实例组成
+- 数据驱动：自动计算属性和追踪依赖的模板表达式
+- 组件化：用可复用、解耦的组件来构造页面
+- 轻量：代码量小，不依赖其他库
+- 快速：精确有效批量DOM更新
+- 模板友好：可通过npm，bower等多种方式安装，很容易融入
+
+### 31 delete和Vue.delete删除数组的区别？
+
+- `delete`只是被删除的元素变成了 `empty/undefined` 其他的元素的键值还是不变。
+- `Vue.delete`直接删除了数组 改变了数组的键值。
+
+```js
+var a=[1,2,3,4]
+var b=[1,2,3,4]
+delete a[0]
+console.log(a)  //[empty,2,3,4]
+this.$delete(b,0)
+console.log(b)  //[2,3,4]
+```
+
+### 32 v-on可以监听多个方法吗？
+
+可以
+
+```html
+<input type="text" :value="name" @input="onInput" @focus="onFocus" @blur="onBlur" />
+```
+
+**v-on 常用修饰符**
+
+- `.stop` 该修饰符将阻止事件向上冒泡。同理于调用 `event.stopPropagation()` 方法
+- `.prevent` 该修饰符会阻止当前事件的默认行为。同理于调用 `event.preventDefault()` 方法
+- `.self` 该指令只当事件是从事件绑定的元素本身触发时才触发回调
+- `.once` 该修饰符表示绑定的事件只会被触发一次
+
+### 33 Vue 改变数组触发视图更新
+
+> 以下方法调用会改变原始数组：`push()`, `pop()`, `shift()`, `unshift()`, `splice()`, `sort()`, `reverse()`,`Vue.set( target, key, value )`
+
+- 调用方法：
+
+  ```
+  Vue.set( target, key, value )
+  ```
+
+  - `target`：要更改的数据源(可以是对象或者数组)
+  - `key`：要更改的具体数据
+  - `value` ：重新赋的值
+
+### 34 动态绑定class
+
+> `active` `classname`， `isActive` 变量
+
+```html
+<div :class="{ active: isActive }"></div>
+```
+
+### 35. 路由原理
+
+> 前端路由实现起来其实很简单，本质就是监听 `URL` 的变化，然后匹配路由规则，显示相应的页面，并且无须刷新。目前单页面使用的路由就只有两种实现方式
+
+- `hash` 模式
+- `history` 模式
+
+> `www.test.com/##/` 就是 `Hash URL`，当 `##` 后面的哈希值发生变化时，不会向服务器请求数据，可以通过 `hashchange` 事件来监听到 `URL` 的变化，从而进行跳转页面。
+
+![img](https://user-gold-cdn.xitu.io/2018/7/11/164888109d57995f?w=942&h=493&f=png&s=39581)
+
+> `History`模式是 `HTML5` 新推出的功能，比之 `Hash URL` 更加美观
+
+
+
+### 36 父子组件生命周期！
+
+![image-20210311150547134](D:\你好北邮\前端\fontend_notebook\框架\image-20210311150547134.png)

@@ -649,7 +649,7 @@ async 函数是什么？一句话，它就是 **Generator 函数的语法糖。*
     console.log(Object.getOwnPropertyDescriptor(school,'name'))
 ```
 
-### 20. ES9 rest新增对对操作
+### 20. ES9 rest新增对象操作
 
 ```javascript
     function connect({host,port,...user}){
